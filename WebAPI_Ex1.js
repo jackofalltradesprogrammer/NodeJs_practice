@@ -1,5 +1,10 @@
 var express = require('express');
 var app = express(); // need to use a consturctor to make the app work
+// body-parser middleware which parses the body and sets req.body property.
+var bodyParser = require('body-parser'); 
+app.use(bodyParser.json()); 
+app.use(bodyParser.urlencoded({ extended: true })); 
+
 
 var mysql = require('mysql');
 var query = "";
@@ -24,7 +29,21 @@ app.get('/:id', function(req, resp){
     query= "SELECT * FROM tblEmployees WHERE id=" + id;
     cn.query(query, function(err,data) {
     resp.send(data);
+    });
 });
+
+app.post('/', function(req, resp){
+    var e = req.body;
+    query = "INSERT INTO tblemployees VALUES("+e.id+ ", '"+e.ename+"', '"+e.job+ "', "+e.salary+")";
+    
+    cn.query(query, function(err){
+        if (!err){
+            console.log("Row added successfully!");
+            resp.send("Row added Successfully!");
+        }
+        else       
+            resp.send("Not Successful!" + err);
+    })
 });
 
 app.listen(9000, function(){
